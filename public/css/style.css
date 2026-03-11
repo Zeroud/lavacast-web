@@ -1,0 +1,74 @@
+body {
+        overflow-x: hidden;
+        overflow-y: auto;
+        transform-style: preserve-3d;
+        background: url("meow.jpg") fixed center/cover no-repeat;
+       }
+      .parallax {
+          position: absolute;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: url("453.png") center top repeat-y;
+      }
+
+      span {
+        font-size: 24px;
+        color: #ffffff;
+        text-shadow: 2px 2px 2px rgba(255, 255, 255, 0.7);
+      }
+
+
+      .grid {
+        position: relative;
+        display: grid;
+        gap: 100px;
+        grid-template-columns: repeat(auto-fit, minmax(1fr,1fr));
+      }
+      .grid img {
+        width: 100%;
+        max-width: 1000px;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+        box-shadow: 0 12px 20px rgba(0,0,0,0.4);
+      }
+
+      .top-bar {
+        position: sticky;    
+        top: 0;
+        width: 100%;
+        padding: 10px;
+        background: rgba(17, 17, 17, 0.274);
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        z-index: 100;        
+      }
+
+      .bottom-bar {
+        bottom: 0;
+        width: 100%;
+        padding: 20px;
+        background:rgba(14, 14, 14, 0.486);
+        text-align: center;
+        box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+        position: relative;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        letter-spacing: 2px; 
+        word-spacing: 20px; 
+      }
+
+      .bottom-bar form {
+        display: inline;
+      }
+
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        color: #ffffffff;
+        background-color: rgb(24,24,24);
+        cursor: pointer;
+        border:rgb(255, 255, 255);
+        border-radius: 7px;
+        box-shadow: #ffffff 0px 0px 10px;
+      }
