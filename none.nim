@@ -67,8 +67,16 @@ proc startMess() =
             resp Http500, "ОШИБКА ДОМА " & e.msg
         get "/FlionGame/download":
           try:
-            attachment("FlionGame.zip")
-            sendFile("./FlionGame.zip")
+            let path = "./FlionGame.zip"
+            let data = readFile(path)  # бинарно-безопасно
+
+            resp Http200,
+              {
+                "Content-Type": "application/zip",
+                "Content-Disposition": "attachment; filename=\"FlionGame.zip\"",
+                "Cache-Control": "no-store"
+              },
+              data
           except Exception as e:
             resp Http500, "ОШИБКА СКАЧИВАНИЯ " & e.msg
 
