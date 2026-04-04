@@ -7,7 +7,7 @@ proc startMess() =
     try:
 
       settings:
-        port = Port(80)
+        port = Port(8080)
         bindAddr = "0.0.0.0"
 
       routes:
@@ -65,6 +65,13 @@ proc startMess() =
           except Exception as e:
             echo "ОШИБКА ДОМА " & e.msg
             resp Http500, "ОШИБКА ДОМА " & e.msg
+        get "/FlionGame/download":
+          try:
+            attachment("FlionGame.zip")
+            sendFile("./FlionGame.zip")
+          except Exception as e:
+            resp Http500, "ОШИБКА СКАЧИВАНИЯ " & e.msg
+
 
         get "/@id":
           try:
