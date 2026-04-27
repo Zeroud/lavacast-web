@@ -33,6 +33,7 @@ body {
       }
 
       .top-bar {
+        margin: -10px;
         position: sticky;    
         top: 0;
         width: 100%;
@@ -44,6 +45,7 @@ body {
       }
 
       .bottom-bar {
+        margin: -10px;
         bottom: 0;
         width: 100%;
         padding: 20px;

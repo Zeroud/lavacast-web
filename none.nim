@@ -14,6 +14,37 @@ proc startMess() =
         get "/":
           echo "мяу"
           try:
+            resp Http200, """
+            <!DOCTYPE html><html><head>
+            <meta charset='utf-8'>
+            <link rel='icon' href='/SoUSchitecture.png' type='image/png'>
+            <link rel='stylesheet' href='/css/main.css'>
+            <meta name='description' content='Lavacast - галерея искусственного интеллекта и FlionGame. Уникальная коллекция'>
+            <meta name='keywords' content='AI, искусственный интеллект, галерея, neuroslop, FlionGame, креветочный Иисус, соус, sous, lavacast, лавакаст'>
+            <meta name='author' content='zeroud_'>
+            <title>lavacast</title>
+            </head><body>
+
+            <form method='get' action='/page'>
+              <button id="neurohellBtn">ИИ галерея</button>
+            </form>
+
+            <form method='get' action='/FlionGame'>
+              <button id="flionGameBtn">FlionGame</button>
+            </form>
+
+            <footer class="bottom-bar">
+              <span>© 2077 zeroud_. Все права отсутствуют.</span>
+            </footer>
+            </body></html>
+            """
+          except Exception as e:
+            echo "ОШИБКА ГЛАВНОЙ " & e.msg
+            resp Http500, "ОШИБКА " & e.msg & " ПРАВА ПРАВА ГДЕ ВСЕ МОИ ПРАВА"
+
+
+        get "/page":
+          try:
             let page = 1
             # папка с картинками
             var files: seq[string] = @[]
@@ -27,13 +58,19 @@ proc startMess() =
 
             html.add "<!DOCTYPE html><html><head>"
             html.add "<meta charset='utf-8'>"
+            html.add"""<link rel='icon' href='/SoUSchitecture.png' type='image/png'>
+            <link rel='stylesheet' href='/css/main.css'>
+            <meta name='description' content='Lavacast - галерея искусственного интеллекта и FlionGame. Уникальная коллекция'>
+            <meta name='keywords' content='AI, искусственный интеллект, галерея, neuroslop, FlionGame, креветочный Иисус, соус, sous, lavacast, лавакаст'>
+            <meta name='author' content='zeroud_'>
+            <title>lavacast</title>"""
             html.add """<link rel='stylesheet' href='/css/style.css'>"""
             html.add """<script src='/js/script.js'></script>"""
             html.add "</head><body>"
 
             html.add """
             <header class="top-bar">
-              <form method='get' action='/'>
+              <form method='get' action='/page'>
                 <button id="shuffleBtn">Перемешать</button>
               </form>
             </header>
@@ -48,12 +85,12 @@ proc startMess() =
 
             html.add """
             <footer class="bottom-bar">
-              <form method='get' action='/""" & $(page-1) & """'>
+              <form method='get' action='/page/""" & $(page-1) & """'>
                 <button id="pageBack">Назад</button>
                 <input type="hidden" name="mass" value=""" & files.join("_") & """></input>
               </form>
               <span>""" & $page & """</span>
-              <form method='get' action='/""" & $(page+1) & """'>
+              <form method='get' action='/page/""" & $(page+1) & """'>
                 <button id="pageForward">Вперёд</button>
                 <input type="hidden" name="mass" value=""" & files.join("_") & """></input>
               </form>
@@ -80,13 +117,36 @@ proc startMess() =
           except Exception as e:
             resp Http500, "ОШИБКА СКАЧИВАНИЯ " & e.msg
 
+        get "/FlionGame":
+          try:
+            resp Http200, """
+            <!DOCTYPE html><html><head>
+            <meta charset='utf-8'>
+            <link rel='icon' href='/SoUSchitecture.png' type='image/png'>
+            <link rel='stylesheet' href='/css/main.css'>
+            <meta name='author' content='zeroud_'>
+            <title>FlionGame</title>
+            </head><body>
+            <iframe frameborder="0" src="https://itch.io/embed/4454355" width="552" height="167"><a href="https://zeroud.itch.io/fliongame">FlionGame by zeroud_</a></iframe>
+            <button id="downloadBtn"><a href="/FlionGame/download" style="color: inherit; text-decoration: none;">Скачать напрямую</a></button>
+            </body></html>
+            """
+          except Exception as e:
+            echo "ОШИБКА FLIONGAME " & e.msg
+            resp Http500, "ОШИБКА FLIONGAME " & e.msg
 
-        get "/@id":
+        get "/page/@id":
           try:
             var html = ""
 
             html.add "<!DOCTYPE html><html><head>"
             html.add "<meta charset='utf-8'>"
+            html.add"""<link rel='icon' href='/SoUSchitecture.png' type='image/png'>
+            <link rel='stylesheet' href='/css/main.css'>
+            <meta name='description' content='Lavacast - галерея искусственного интеллекта и FlionGame. Уникальная коллекция'>
+            <meta name='keywords' content='AI, искусственный интеллект, галерея, neuroslop, FlionGame, креветочный Иисус, соус, sous, lavacast, лавакаст'>
+            <meta name='author' content='zeroud_'>
+            <title>lavacast</title>"""
             html.add """<link rel='stylesheet' href='/css/style.css'>"""
             html.add """<script src='/js/script.js'></script>"""
             html.add "</head><body>"
@@ -124,17 +184,17 @@ proc startMess() =
 
               if startIdx < files.len and startIdx >= 0:
                 for img in files[startIdx..<endIdx]:
-                  html.add "<img src='neurohell/" & img & "' alt='' loading='lazy'>"
+                  html.add "<img src='/neurohell/" & img & "' alt='' loading='lazy'>"
               html.add "</div>"
 
               html.add """
               <footer class="bottom-bar">
-                <form method='get' action='/""" & $ (page-1) & """'>
+                <form method='get' action='/page/""" & $ (page-1) & """'>
                   <button id="pageBack">Назад</button>
                   <input type="hidden" name="mass" value=""" & files.join("_") & """></input>
                 </form>
                 <span>""" & $page & """</span>
-                <form method='get' action='/""" & $ (page+1) & """'>
+                <form method='get' action='/page/""" & $ (page+1) & """'>
                   <button id="pageForward">Вперёд</button>
                   <input type="hidden" name="mass" value=""" & files.join("_") & """></input>
                 </form>
