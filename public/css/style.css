@@ -46,18 +46,16 @@ body {
 
       .bottom-bar {
         margin: -10px;
-        bottom: 0;
         width: 100%;
         padding: 20px;
         background:rgba(14, 14, 14, 0.486);
         text-align: center;
         box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
-        position: relative;
-        align-items: center;
         justify-content: center;
         gap: 20px;
         letter-spacing: 2px; 
-        word-spacing: 20px; 
+        word-spacing: 20px;
+        position: sticky; 
       }
 
       .bottom-bar form {
