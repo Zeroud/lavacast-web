@@ -19,7 +19,7 @@ proc startMess() =
             <meta charset='utf-8'>
             <link rel='icon' href='/SoUSchitecture.png' type='image/png'>
             <link rel='stylesheet' href='/css/main.css'>
-            <meta name='description' content='Lavacast - галерея искусственного интеллекта и FlionGame. Уникальная коллекция'>
+            <meta name='description' content='Lavacast - галерея искусственного интеллекта и фигня какая-то. Уникальная коллекция'>
             <meta name='keywords' content='AI, искусственный интеллект, галерея, neuroslop, FlionGame, креветочный Иисус, соус, sous, lavacast, лавакаст'>
             <meta name='author' content='zeroud_'>
             <title>lavacast</title>
@@ -41,8 +41,6 @@ proc startMess() =
           except Exception as e:
             echo "ОШИБКА ГЛАВНОЙ " & e.msg
             resp Http500, "ОШИБКА " & e.msg & " ПРАВА ПРАВА ГДЕ ВСЕ МОИ ПРАВА"
-
-
         get "/page":
           try:
             let page = 1
@@ -60,7 +58,7 @@ proc startMess() =
             html.add "<meta charset='utf-8'>"
             html.add"""<link rel='icon' href='/SoUSchitecture.png' type='image/png'>
             <link rel='stylesheet' href='/css/main.css'>
-            <meta name='description' content='Lavacast - галерея искусственного интеллекта и FlionGame. Уникальная коллекция'>
+            <meta name='description' content='Lavacast - галерея искусственного интеллекта и фигня какая-то. Уникальная коллекция'>
             <meta name='keywords' content='AI, искусственный интеллект, галерея, neuroslop, FlionGame, креветочный Иисус, соус, sous, lavacast, лавакаст'>
             <meta name='author' content='zeroud_'>
             <title>lavacast</title>"""
@@ -87,12 +85,12 @@ proc startMess() =
             <footer class="bottom-bar">
               <form method='get' action='/page/""" & $(page-1) & """'>
                 <button id="pageBack">Назад</button>
-                <input type="hidden" name="mass" value=""" & files.join("_") & """></input>
+                <input type="hidden" name="mass" value=""" & files.mapIt(it.replace(".jpg", "")).join("_") & """></input>
               </form>
               <span>""" & $page & """</span>
               <form method='get' action='/page/""" & $(page+1) & """'>
                 <button id="pageForward">Вперёд</button>
-                <input type="hidden" name="mass" value=""" & files.join("_") & """></input>
+                <input type="hidden" name="mass" value=""" & files.mapIt(it.replace(".jpg", "")).join("_") & """></input>
               </form>
             </footer>
             """
@@ -116,7 +114,6 @@ proc startMess() =
               data
           except Exception as e:
             resp Http500, "ОШИБКА СКАЧИВАНИЯ " & e.msg
-
         get "/FlionGame":
           try:
             resp Http200, """
@@ -134,7 +131,6 @@ proc startMess() =
           except Exception as e:
             echo "ОШИБКА FLIONGAME " & e.msg
             resp Http500, "ОШИБКА FLIONGAME " & e.msg
-
         get "/page/@id":
           try:
             var html = ""
@@ -143,7 +139,7 @@ proc startMess() =
             html.add "<meta charset='utf-8'>"
             html.add"""<link rel='icon' href='/SoUSchitecture.png' type='image/png'>
             <link rel='stylesheet' href='/css/main.css'>
-            <meta name='description' content='Lavacast - галерея искусственного интеллекта и FlionGame. Уникальная коллекция'>
+            <meta name='description' content='Lavacast - галерея искусственного интеллекта и фигня какая-то. Уникальная коллекция'>
             <meta name='keywords' content='AI, искусственный интеллект, галерея, neuroslop, FlionGame, креветочный Иисус, соус, sous, lavacast, лавакаст'>
             <meta name='author' content='zeroud_'>
             <title>lavacast</title>"""
@@ -154,22 +150,22 @@ proc startMess() =
             var page: int
             try: page = @"id".parseInt()
             except Exception as e: resp Http400, "Я ТЕБЕ ЩА РУКИ ПООТРЫВАЮ " & e.msg & """
-            <form method='get' action='/'><button id="shuffleBtn">Перемешать</button></form>"""
+            <form method='get' action='/'><button id="shuffleBtn">Вернуться</button></form>"""
 
             if not request.params.hasKey("mass"):
               html.add "<h1>ВЕРНИ НА МЕСТО</h1>" & """
-              <form method='get' action='/'><button id="shuffleBtn">Перемешать</button></form>"""
+              <form method='get' action='/'><button id="shuffleBtn">Вернуться</button></form>"""
               resp Http200, html
             elif page < 1:
               html.add "<h1>куда собрался</h1>" & """
-              <form method='get' action='/'><button id="shuffleBtn">Перемешать</button></form>"""
+              <form method='get' action='/page'><button id="shuffleBtn">Вернуться</button></form>"""
               resp Http200, html
             else:
-              let files = request.params["mass"].split("_").toSeq()
+              let files = request.params["mass"].split("_").toSeq().mapIt(it & ".jpg")
 
               html.add """
               <header class="top-bar">
-              <form method='get' action='/'>
+              <form method='get' action='/page'>
                   <button id="shuffleBtn">Перемешать</button>
                 </form>
               </header>
@@ -189,14 +185,14 @@ proc startMess() =
 
               html.add """
               <footer class="bottom-bar">
-                <form method='get' action='/page/""" & $ (page-1) & """'>
+                <form method='get' action='/page/""" & $(page-1) & """'>
                   <button id="pageBack">Назад</button>
-                  <input type="hidden" name="mass" value=""" & files.join("_") & """></input>
+                  <input type="hidden" name="mass" value=""" & files.mapIt(it.replace(".jpg", "")).join("_") & """></input>
                 </form>
                 <span>""" & $page & """</span>
-                <form method='get' action='/page/""" & $ (page+1) & """'>
+                <form method='get' action='/page/""" & $(page+1) & """'>
                   <button id="pageForward">Вперёд</button>
-                  <input type="hidden" name="mass" value=""" & files.join("_") & """></input>
+                  <input type="hidden" name="mass" value=""" & files.mapIt(it.replace(".jpg", "")).join("_") & """></input>
                 </form>
               </footer>
               """
@@ -206,7 +202,15 @@ proc startMess() =
           except Exception as e:
             echo "ОШИБКА " & e.msg
             resp Http500, "ОШИБКА " & e.msg
-
+        post "/like/@id":
+          try:
+            let id = @"id"
+            # Здесь можно добавить логику для обработки лайков, например, сохранять их в файл или базу данных
+            echo "Пользователь поставил лайк картинке с ID: " & id
+            resp Http200, "Лайк поставлен для картинки с ID: " & id
+          except Exception as e:
+            echo "ОШИБКА ЛАЙКА " & e.msg
+            resp Http500, "ОШИБКА ЛАЙКА " & e.msg
           
     except Exception as e:
       echo "доктор, опять началось " & e.msg

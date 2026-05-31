@@ -8,6 +8,8 @@ body {
           position: absolute;
           top: 0; left: 0; right: 0; bottom: 0;
           background: url("453.png") center top repeat-y;
+          z-index: 0;
+          pointer-events: none;
       }
 
       span {
@@ -22,6 +24,7 @@ body {
         display: grid;
         gap: 100px;
         grid-template-columns: repeat(auto-fit, minmax(1fr,1fr));
+        margin-bottom: 20px;
       }
       .grid img {
         width: 100%;
@@ -29,7 +32,7 @@ body {
         height: auto;
         display: block;
         margin: 0 auto;
-        box-shadow: 0 12px 20px rgba(0,0,0,0.4);
+        box-shadow: 0 50px 20px rgba(0,0,0,0.4);
       }
 
       .top-bar {
@@ -44,18 +47,22 @@ body {
         z-index: 100;        
       }
 
-      .bottom-bar {
+      
+      footer.bottom-bar {
         margin: -10px;
         width: 100%;
         padding: 20px;
-        background:rgba(14, 14, 14, 0.486);
+        background: rgba(14, 14, 14, 0.486);
         text-align: center;
         box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
         justify-content: center;
         gap: 20px;
-        letter-spacing: 2px; 
+        letter-spacing: 2px;
         word-spacing: 20px;
-        position: sticky; 
+        position: relative;
+        z-index: 10;
       }
 
       .bottom-bar form {
