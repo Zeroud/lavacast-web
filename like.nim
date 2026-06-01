@@ -1,25 +1,29 @@
-import os, strutils, json
+import os, strutils, json, sequtils, sugar
 
-proc preLike(whoIs: string, whereIs: int) =
+proc preLike*(whoIs: string, whereIs: int) =
     var nigger = readFile("data/likes.json").parseJson{"entities"}.getElems
     var likeIt = false
     if nigger.len - 1 < whereIs:
         var напиздел = true
         for kind, ite in walkDir("public/neurohell"):
-            let maga = ite.replace(".jpg", "").parseInt
+            let maga = ite.replace(".jpg", "").replace("public\\neurohell\\", "").parseInt
+            echo maga
             if maga == whereIs:
                 напиздел = false
                 break 
         if напиздел:
+            echo "умри"
             discard
         else:
-            while not nigger.len - 1 >= whereIs:
+            echo "не умри"
+            while nigger.len - 1 <= whereIs:
+                echo "добавляем к " & $nigger.len
                 nigger.add %*( @[] )
-    
-    if nigger[whereIs].getElems.contains(whoIs):
-        likeIt = true
-    else:
+    echo "считай"
+    if nigger[whereIs].getElems.mapIt(it.getStr).contains(whoIs):
         likeIt = false
+    else:
+        likeIt = true
         
     block:
         let temp = open("data/temp", fmAppend)
@@ -27,17 +31,27 @@ proc preLike(whoIs: string, whereIs: int) =
         temp.close()
 
 
-proc postLike():
-  let likeList = readFile(data/temp).splitLines().mapIt(it.split(" "))
-  var mainFile = parseJson(readfile("data/likes.json"))
+proc postLike*() = 
+  echo "ЭЙ Я РАБОТАЮ"
+  let likeList = readFile("data/temp").splitLines().mapIt(it.split(" "))
+  var mainFile = parseJson(readfile("data/likes.json")).getElems
   for like in likeList:
+    if like.len != 3:
+      echo "Неверный формат строки лайка: " & like.join(" ")
+      continue
+    echo like
+    let key = like[0].parseInt()
+    let userName = like[1]
+    while mainFile.len - 1 < key:
+        mainFile.add %*( @[] )
     if not like[2].parseBool():
-      mainFile[ like[0].parseInt() ] = mainFile[ like[0].parseInt() ].keepIf(proc(x: string):bool = x != like[1] )
+      mainFile[key] = %* mainFile[key].getElems.filter(proc(x: JsonNode):bool = x.getStr != userName )
     else:
-      mainFile[ like[0].parseInt() ].add like[1]
+      mainFile[key].add (%* userName)
   open("data/temp", fmWrite).close()
   
   block:
+    echo "sav"
     let temp = open("data/likes.json", fmWrite)
-    temp.write ($mainFile).toPretty
+    temp.write $((%* mainFile).pretty())
     temp.close()

@@ -1,4 +1,4 @@
-import jester,  random, os, strutils, sequtils
+import jester,  random, os, strutils, sequtils, like
 
 randomize()
 
@@ -49,7 +49,7 @@ proc startMess() =
           try:
             postLike()
           except Exception as e:
-            echo "бля"
+            echo "бля " & e.msg 
           try:
             let page = 1
             # папка с картинками
@@ -197,6 +197,10 @@ proc startMess() =
                   <button id="pageBack">Назад</button>
                   <input type="hidden" name="mass" value=""" & files.mapIt(it.replace(".jpg", "")).join("_") & """></input>
                 </form>
+                <form method='post' action='/like/""" & $(page-1) & """'>
+                  <button id="pageBack">лайк</button>
+                  <input type="hidden" name="mass" value=""" & files.mapIt(it.replace(".jpg", "")).join("_") & """></input>
+                </form>
                 <span>""" & $page & """</span>
                 <form method='get' action='/page/""" & $(page+1) & """'>
                   <button id="pageForward">Вперёд</button>
@@ -213,7 +217,7 @@ proc startMess() =
         post "/like/@id":
           try:
             let id = @"id"
-            preLike(id, request.ip)
+            preLike($request.ip, id.parseInt)
             echo "Пользователь поставил лайк картинке с ID: " & id
             resp Http200, "Лайк поставлен для картинки с ID: " & id
           except Exception as e:
