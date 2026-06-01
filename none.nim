@@ -14,6 +14,10 @@ proc startMess() =
         get "/":
           echo "мяу"
           try:
+            postLike()
+          except Exception as e:
+            echo "бля"
+          try:
             resp Http200, """
             <!DOCTYPE html><html><head>
             <meta charset='utf-8'>
@@ -42,6 +46,10 @@ proc startMess() =
             echo "ОШИБКА ГЛАВНОЙ " & e.msg
             resp Http500, "ОШИБКА " & e.msg & " ПРАВА ПРАВА ГДЕ ВСЕ МОИ ПРАВА"
         get "/page":
+          try:
+            postLike()
+          except Exception as e:
+            echo "бля"
           try:
             let page = 1
             # папка с картинками
@@ -205,7 +213,7 @@ proc startMess() =
         post "/like/@id":
           try:
             let id = @"id"
-            # Здесь можно добавить логику для обработки лайков, например, сохранять их в файл или базу данных
+            preLike(id, request.ip)
             echo "Пользователь поставил лайк картинке с ID: " & id
             resp Http200, "Лайк поставлен для картинки с ID: " & id
           except Exception as e:
