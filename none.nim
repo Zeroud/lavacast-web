@@ -14,10 +14,6 @@ proc startMess() =
         get "/":
           echo "мяу"
           try:
-            postLike()
-          except Exception as e:
-            echo "бля"
-          try:
             resp Http200, """
             <!DOCTYPE html><html><head>
             <meta charset='utf-8'>
@@ -85,16 +81,14 @@ proc startMess() =
             html.add "<div class='parallax'></div>"
 
             html.add "<div class='grid'>"
-            for img in files[0..<15]:
-              html.add "<img src='neurohell/" & img & "' alt='' loading='lazy'>"
+            for idx, img in files[0..<15]:
+              html.add "<div class='image-container'>"
+              html.add "<img src='neurohell/" & img & "' alt='' loading='lazy' data-index='" & $idx & "'>"
+              html.add "<button class='like-btn' data-index='" & $idx & "' data-image='" & img & "'>❤️ Лайк</button>"
+              html.add "</div>"
             html.add "</div>"
 
             html.add """
-            <footer class="bottom-bar">
-              <form method='get' action='/page/""" & $(page-1) & """'>
-                <button id="pageBack">Назад</button>
-                <input type="hidden" name="mass" value=""" & files.mapIt(it.replace(".jpg", "")).join("_") & """></input>
-              </form>
               <span>""" & $page & """</span>
               <form method='get' action='/page/""" & $(page+1) & """'>
                 <button id="pageForward">Вперёд</button>
@@ -102,7 +96,6 @@ proc startMess() =
               </form>
             </footer>
             """
-
             html.add "</body></html>"
             resp Http200, html
           except Exception as e:
@@ -140,6 +133,10 @@ proc startMess() =
             echo "ОШИБКА FLIONGAME " & e.msg
             resp Http500, "ОШИБКА FLIONGAME " & e.msg
         get "/page/@id":
+          try:
+            postLike()
+          except Exception as e:
+            echo "бля"
           try:
             var html = ""
 
@@ -197,10 +194,6 @@ proc startMess() =
                   <button id="pageBack">Назад</button>
                   <input type="hidden" name="mass" value=""" & files.mapIt(it.replace(".jpg", "")).join("_") & """></input>
                 </form>
-                <form method='post' action='/like/""" & $(page-1) & """'>
-                  <button id="pageBack">лайк</button>
-                  <input type="hidden" name="mass" value=""" & files.mapIt(it.replace(".jpg", "")).join("_") & """></input>
-                </form>
                 <span>""" & $page & """</span>
                 <form method='get' action='/page/""" & $(page+1) & """'>
                   <button id="pageForward">Вперёд</button>
@@ -217,12 +210,18 @@ proc startMess() =
         post "/like/@id":
           try:
             let id = @"id"
-            preLike($request.ip, id.parseInt)
+            let realIp =
+              if request.headers.hasKey("X-Forwarded-For"):
+                request.headers["X-Forwarded-For"].split(",")[0].strip()
+              elif request.headers.hasKey("X-Real-IP"):
+                request.headers["X-Real-IP"]
+              else: $request.ip
+            preLike($realIp, id.parseInt)
             echo "Пользователь поставил лайк картинке с ID: " & id
-            resp Http200, "Лайк поставлен для картинки с ID: " & id
+            resp Http200
           except Exception as e:
             echo "ОШИБКА ЛАЙКА " & e.msg
-            resp Http500, "ОШИБКА ЛАЙКА " & e.msg
+            resp Http500
           
     except Exception as e:
       echo "доктор, опять началось " & e.msg
