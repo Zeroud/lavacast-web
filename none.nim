@@ -1,4 +1,4 @@
-import jester,  random, os, strutils, sequtils, like
+import jester,  random, os, strutils, sequtils, algorithm, like, json, sugar
 
 randomize()
 
@@ -42,6 +42,14 @@ proc startMess() =
             echo "ОШИБКА ГЛАВНОЙ " & e.msg
             resp Http500, "ОШИБКА " & e.msg & " ПРАВА ПРАВА ГДЕ ВСЕ МОИ ПРАВА"
         get "/page":
+
+          let realIp =
+            if request.headers.hasKey("X-Forwarded-For"):
+              request.headers["X-Forwarded-For"].split(",")[0].strip()
+            elif request.headers.hasKey("X-Real-IP"):
+              request.headers["X-Real-IP"]
+            else: $request.ip
+
           try:
             postLike()
           except Exception as e:
@@ -53,6 +61,10 @@ proc startMess() =
             for kind, path in walkDir("public/neurohell/"):
               if kind == pcFile:
                 files.add(extractFilename(path))
+
+            let dataIs: seq[int] = readFile("data/likes.json").parseJson(){"entities"}.getElems().mapIt(it.getElems().len)
+            var dataFiles: seq[string] = toSeq(0..(dataIs.len-1)).sortedByIt(-dataIs[it]).mapIt($it)
+
 
             files.shuffle()
 
@@ -72,8 +84,13 @@ proc startMess() =
 
             html.add """
             <header class="top-bar">
-              <form method='get' action='/page'>
-                <button id="shuffleBtn">Перемешать</button>
+              <form method='get' action='/page/1'>
+                <button id="bestBtn">Лучшие</button>
+                <input type="hidden" name="mass" value=""" & dataFiles.join("_") & """></input>
+              </form>
+              <form method='get' action='/page/1'>
+                <button id="worstBtn">Худшие</button>
+                <input type="hidden" name="mass" value=""" & dataFiles.reversed().join("_") & """></input>
               </form>
             </header>
             """
@@ -82,13 +99,29 @@ proc startMess() =
 
             html.add "<div class='grid'>"
             for idx, img in files[0..<15]:
+              let imgId = img.replace(".jpg", "")
+              var jsonData: string
+              var liked = false
+              try:
+                let datax = parseJson(readFile("data/likes.json")){"entities"}.getElems()
+                jsonData = if datax.len > imgId.parseInt: $datax[imgId.parseInt].len else: "0"
+                if datax[imgId.parseInt].getElems().mapIt(it.getStr()).contains(realIp):
+                      liked = true
+              except Exception as e:
+                jsonData = e.msg
               html.add "<div class='image-container'>"
-              html.add "<img src='neurohell/" & img & "' alt='' loading='lazy' data-index='" & $idx & "'>"
-              html.add "<button class='like-btn' data-index='" & $idx & "' data-image='" & img & "'>❤️ Лайк</button>"
+              html.add "<img src='/neurohell/" & img & "' alt='' loading='lazy' id='" & $idx & "'>"
+              html.add """
+              <form method='post' action='/like/""" & imgId & """'>
+                <button id='like-btn' data-active='""" & $(liked) & """'>♥ """ & jsonData & """</button>
+                <input type="hidden" name="mass" value=""" & files.mapIt(it.replace(".jpg", "")).join("_") & """></input>
+              </form>
+              """
               html.add "</div>"
             html.add "</div>"
 
             html.add """
+            <footer class="bottom-bar">
               <span>""" & $page & """</span>
               <form method='get' action='/page/""" & $(page+1) & """'>
                 <button id="pageForward">Вперёд</button>
@@ -138,6 +171,14 @@ proc startMess() =
           except Exception as e:
             echo "бля"
           try:
+
+            let realIp =
+              if request.headers.hasKey("X-Forwarded-For"):
+                request.headers["X-Forwarded-For"].split(",")[0].strip()
+              elif request.headers.hasKey("X-Real-IP"):
+                request.headers["X-Real-IP"]
+              else: $request.ip
+
             var html = ""
 
             html.add "<!DOCTYPE html><html><head>"
@@ -172,7 +213,7 @@ proc startMess() =
               <header class="top-bar">
               <form method='get' action='/page'>
                   <button id="shuffleBtn">Перемешать</button>
-                </form>
+              </form>
               </header>
               """
 
@@ -184,8 +225,26 @@ proc startMess() =
               let endIdx = if page*15 > files.len: files.len else: page*15
 
               if startIdx < files.len and startIdx >= 0:
-                for img in files[startIdx..<endIdx]:
-                  html.add "<img src='/neurohell/" & img & "' alt='' loading='lazy'>"
+                for idx, img in files[startIdx..<endIdx]:
+                  let imgId = img.replace(".jpg", "")
+                  var jsonData: string
+                  var liked = false
+                  try:
+                    let datax:seq[JsonNode] = parseJson(readFile("data/likes.json")){"entities"}.getElems()
+                    jsonData = if datax.len > imgId.parseInt: $datax[imgId.parseInt].getElems().len else: "0"
+                    if datax[imgId.parseInt].getElems().mapIt(it.getStr()).contains(realIp):
+                      liked = true
+                  except Exception as e:
+                    jsonData = e.msg
+                  html.add "<div class='image-container'>"
+                  html.add "<img src='/neurohell/" & img & "' alt='' loading='lazy' id='" & $idx & "'>"
+                  html.add """
+                  <form method='post' action='/like/""" & imgId & """'>
+                    <button id='like-btn' data-active='""" & $(liked) & """'>♥ """ & jsonData & """</button>
+                    <input type="hidden" name="mass" value=""" & files.mapIt(it.replace(".jpg", "")).join("_") & """></input>
+                  </form>
+                  """
+                  html.add "</div>"
               html.add "</div>"
 
               html.add """
@@ -216,12 +275,14 @@ proc startMess() =
               elif request.headers.hasKey("X-Real-IP"):
                 request.headers["X-Real-IP"]
               else: $request.ip
+            if  request.params["mass"].split("_").mapIt(it.parseInt).max < id.parseInt:
+              resp Http406, "не-а" & """
+              <form method='get' action='/'><button id="shuffleBtn">Вернуться</button></form>"""
             preLike($realIp, id.parseInt)
-            echo "Пользователь поставил лайк картинке с ID: " & id
-            resp Http200
+            redirect("/page/" & $(((request.params["mass"].split("_").findIt(it == id) ) div 15) + 1) & "?mass=" & request.params["mass"] & "#" & $(request.params["mass"].split("_").findIt(it == id) %% 15) )
           except Exception as e:
             echo "ОШИБКА ЛАЙКА " & e.msg
-            resp Http500
+            resp Http500, "ну что ты наделал " & e.msg 
           
     except Exception as e:
       echo "доктор, опять началось " & e.msg
