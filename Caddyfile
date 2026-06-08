@@ -9,7 +9,7 @@ tls zeroud47@gmail.com
 
 route {
 	forward_proxy {
-		basic_auth zeroud_bad_moderator_228777 Lynx_by_my_light
+		basic_auth 1 2
 		hide_ip
 		hide_via
 		probe_resistance
