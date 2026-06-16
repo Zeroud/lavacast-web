@@ -1,4 +1,6 @@
 nonpublic/
+data/
 *.exe
 *.bin
+
 CaddyFile
