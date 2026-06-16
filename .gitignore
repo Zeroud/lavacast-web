@@ -1,4 +1,5 @@
 nonpublic/
-
+data/
+Caddyfile
 *.exe
 *.bin
