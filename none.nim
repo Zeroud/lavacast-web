@@ -1,4 +1,4 @@
-import jester,  random, os, strutils, sequtils, algorithm, like, json, sugar
+import jester,  random, os, strutils, sequtils, algorithm, like, json
 
 randomize()
 
@@ -241,7 +241,7 @@ proc startMess() =
                   html.add """
                   <form method='post' action='/like/""" & imgId & """'>
                     <button id='like-btn' data-active='""" & $(liked) & """'>♥ """ & jsonData & """</button>
-                    <input type="hidden" name="mass" value=""" & files.mapIt(it.replace(".jpg", "")).join("_") & """></input>
+                    <input type="hidden" name="mass" value=""" & request.params["mass"] & """></input>
                   </form>
                   """
                   html.add "</div>"
@@ -251,12 +251,12 @@ proc startMess() =
               <footer class="bottom-bar">
                 <form method='get' action='/page/""" & $(page-1) & """'>
                   <button id="pageBack">Назад</button>
-                  <input type="hidden" name="mass" value=""" & files.mapIt(it.replace(".jpg", "")).join("_") & """></input>
+                  <input type="hidden" name="mass" value=""" & request.params["mass"] & """></input>
                 </form>
                 <span>""" & $page & """</span>
                 <form method='get' action='/page/""" & $(page+1) & """'>
                   <button id="pageForward">Вперёд</button>
-                  <input type="hidden" name="mass" value=""" & files.mapIt(it.replace(".jpg", "")).join("_") & """></input>
+                  <input type="hidden" name="mass" value=""" & request.params["mass"] & """></input>
                 </form>
               </footer>
               """
@@ -283,6 +283,27 @@ proc startMess() =
           except Exception as e:
             echo "ОШИБКА ЛАЙКА " & e.msg
             resp Http500, "ну что ты наделал " & e.msg 
+
+        get "/api":
+          try:
+            let realIp =
+              if request.headers.hasKey("X-Forwarded-For"):
+                request.headers["X-Forwarded-For"].split(",")[0].strip()
+              elif request.headers.hasKey("X-Real-IP"):
+                request.headers["X-Real-IP"]
+              else: $request.ip
+            if realIp == "144.31.82.63":
+              let data = readFile("data/likes.json").parseJson().getElems().mapIt(it.getElems().len)
+              var files: seq[int] = @[]
+              for kind, path in walkDir("public/neurohell/"):
+                if kind == pcFile:
+                  files.add(extractFilename(path).replace(".jpg", "").parseInt())
+              resp Http200, $ %*{"likes": data, "lastImg": files.max}
+            else:
+              resp Http403, "not allowed"
+          except Exception as e:
+            echo "ОШИБКА АПИ " & e.msg
+            resp Http500, "ОШИБКА АПИ " & e.msg
           
     except Exception as e:
       echo "доктор, опять началось " & e.msg
