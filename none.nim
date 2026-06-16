@@ -104,9 +104,11 @@ proc startMess() =
               var liked = false
               try:
                 let datax = parseJson(readFile("data/likes.json")){"entities"}.getElems()
-                jsonData = if datax.len > imgId.parseInt: $datax[imgId.parseInt].len else: "0"
-                if datax[imgId.parseInt].getElems().mapIt(it.getStr()).contains(realIp):
-                      liked = true
+                jsonData =                       
+                  if datax.len > imgId.parseInt:
+                    if datax[imgId.parseInt].getElems().mapIt(it.getStr()).contains(realIp): liked = true
+                    $datax[imgId.parseInt].getElems().len 
+                  else: "0"
               except Exception as e:
                 jsonData = e.msg
               html.add "<div class='image-container'>"
@@ -230,10 +232,12 @@ proc startMess() =
                   var jsonData: string
                   var liked = false
                   try:
-                    let datax:seq[JsonNode] = parseJson(readFile("data/likes.json")){"entities"}.getElems()
-                    jsonData = if datax.len > imgId.parseInt: $datax[imgId.parseInt].getElems().len else: "0"
-                    if datax[imgId.parseInt].getElems().mapIt(it.getStr()).contains(realIp):
-                      liked = true
+                    let datax = parseJson(readFile("data/likes.json")){"entities"}.getElems()
+                    jsonData =                        
+                      if datax.len > imgId.parseInt:
+                        if datax[imgId.parseInt].getElems().mapIt(it.getStr()).contains(realIp): liked = true
+                        $datax[imgId.parseInt].getElems().len 
+                      else: "0"
                   except Exception as e:
                     jsonData = e.msg
                   html.add "<div class='image-container'>"
