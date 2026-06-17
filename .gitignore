@@ -1,5 +1,6 @@
 nonpublic/
 data/
+utils/pic/
 Caddyfile
 *.exe
 *.bin
