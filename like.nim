@@ -7,7 +7,7 @@ proc preLike*(whoIs: string, whereIs: int) =
     if nigger.len - 1 < whereIs:
         var напиздел = true
         for kind, ite in walkDir("public/neurohell"):
-            let maga = ite.replace(".jpg", "").replace("public\\neurohell\\", "").parseInt
+            let maga = ite.replace(".jpg", "").replace("public/neurohell/", "").parseInt
             if maga == whereIs:
                 напиздел = false
                 break 
